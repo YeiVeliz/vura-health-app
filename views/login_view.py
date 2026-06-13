@@ -1,109 +1,77 @@
 import flet as ft
+import time
 from utils.firebase_config import auth
 
 def LoginView(page: ft.Page, navigate_to):
-    email_input = ft.TextField(
-        label="Correo electrónico",
-        keyboard_type=ft.KeyboardType.EMAIL,
-        width=300,
-        border_radius=10,
-        focused_border_color=ft.Colors.BLUE_700,
+    input_style = dict(
+        filled=True,
+        fill_color=ft.Colors.GREY_100,
+        border_color=ft.Colors.TRANSPARENT,
+        border_radius=20,
+        content_padding=ft.Padding(20, 15, 20, 15),
     )
-    
-    password_input = ft.TextField(
-        label="Contraseña",
-        password=True,
-        can_reveal_password=True,
-        width=300,
-        border_radius=10,
-        focused_border_color=ft.Colors.BLUE_700,
-    )
-    
-    error_text = ft.Text(color=ft.Colors.RED_600, size=14, weight="bold")
-    
-    # Indicador de carga
-    loading_indicator = ft.ProgressRing(visible=False, width=20, height=20, stroke_width=2)
-    
-    def handle_login(e):
-        error_text.value = ""
-        error_text.color = ft.Colors.RED_600
-        loading_indicator.visible = True
-        page.update()
-        
-        email = email_input.value.strip()
-        password = password_input.value.strip()
-        
-        if not email or not password:
-            error_text.value = "Por favor, completa todos los campos."
-            loading_indicator.visible = False
-            page.update()
-            return
-            
-        try:
-            # Intentar iniciar sesión con Firebase
-            user = auth.sign_in_with_email_and_password(email, password)
-            
-            # Guardamos la sesión del usuario en la página
-            page.data = {"user": user}
-            
-            error_text.value = "¡Inicio de sesión exitoso!"
-            error_text.color = ft.Colors.GREEN_600
-            loading_indicator.visible = False
-            page.update()
-            
-            # Navegar al Dashboard principal
-            import time
-            time.sleep(1)
-            navigate_to("/home")
-            
-        except Exception as err:
-            print("Error en login:", err)
-            loading_indicator.visible = False
-            error_text.value = "Correo o contraseña incorrectos."
-            page.update()
 
-    return ft.Container(
-        content=ft.Column(
-            [
-                # Botón de retroceso alineado a la izquierda
-                ft.Row(
-                    [
-                        ft.IconButton(
-                            icon=ft.Icons.ARROW_BACK_IOS_NEW,
-                            on_click=lambda _: navigate_to("/"),
-                            icon_color=ft.Colors.BLUE_700,
-                            icon_size=20,
-                        )
-                    ],
-                    alignment=ft.MainAxisAlignment.START,
-                ),
-                ft.Divider(height=10, color=ft.Colors.TRANSPARENT),
-                ft.Icon(ft.Icons.LOCK_PERSON_ROUNDED, size=80, color=ft.Colors.BLUE_700),
-                ft.Divider(height=10, color=ft.Colors.TRANSPARENT),
-                ft.Text("Iniciar Sesión", size=32, weight="bold", color=ft.Colors.BLUE_900),
-                ft.Text("Bienvenido de vuelta a Vura", size=16, color=ft.Colors.BLUE_GREY_500),
-                ft.Divider(height=30, color=ft.Colors.TRANSPARENT),
-                email_input,
-                password_input,
-                error_text,
-                loading_indicator,
-                ft.Divider(height=10, color=ft.Colors.TRANSPARENT),
-                ft.ElevatedButton(
-                    "Entrar",
-                    on_click=handle_login,
-                    width=300,
-                    height=55,
-                    style=ft.ButtonStyle(
-                        shape=ft.RoundedRectangleBorder(radius=12),
-                        bgcolor=ft.Colors.BLUE_700,
-                        color=ft.Colors.WHITE,
-                    )
-                ),
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-        ),
-        alignment=ft.Alignment(0, 0),
+    email = ft.TextField(label="Email", **input_style)
+    password = ft.TextField(label="Password", password=True, can_reveal_password=True, **input_style)
+    
+    container = ft.Container(
+        bgcolor=ft.Colors.BLUE_700,
         expand=True,
-        padding=20,
+        content=ft.Column([
+            ft.Container(height=40),
+            ft.Row([ft.IconButton(ft.Icons.ARROW_BACK, on_click=lambda _: navigate_to("/"), icon_color=ft.Colors.WHITE)]),
+            ft.Container(height=20),
+                ft.Container(
+                    bgcolor=ft.Colors.WHITE,
+                    border_radius=ft.BorderRadius(40, 40, 0, 0),
+                    padding=30,
+                    expand=True,
+                    content=ft.Column([
+                    ft.Text("Welcome back", size=28, weight="bold", color=ft.Colors.BLUE_900),
+                    ft.Container(height=20),
+                    email,
+                    ft.Container(height=15),
+                    password,
+                    ft.Container(height=5),
+                    ft.Row([ft.TextButton("Forgot password?", on_click=lambda _: None)], alignment=ft.MainAxisAlignment.END),
+                    ft.Container(height=25),
+                    ft.ElevatedButton(
+                        "Sign In", 
+                        width=float("inf"), 
+                        height=55, 
+                        style=ft.ButtonStyle(
+                            shape=ft.RoundedRectangleBorder(radius=20), 
+                            bgcolor=ft.Colors.BLUE_700, 
+                            color=ft.Colors.WHITE
+                        )
+                    ),
+                    ft.Container(height=35),
+                    ft.Divider(color=ft.Colors.GREY_300),
+                    ft.Container(height=20),
+                    ft.Text("Sign in with", color=ft.Colors.GREY_500, text_align=ft.TextAlign.CENTER),
+                    ft.Container(height=15),
+                    ft.Row([
+                        ft.IconButton(ft.Icons.FACEBOOK, icon_color=ft.Colors.BLUE_800), 
+                        ft.IconButton(ft.Icons.G_MOBILEDATA, icon_color=ft.Colors.RED_600), 
+                        ft.IconButton(ft.Icons.APPLE, icon_color=ft.Colors.BLACK)
+                    ], alignment=ft.MainAxisAlignment.CENTER),
+                    ft.Container(expand=True),
+                    ft.Row([ft.Text("Don't have an account?"), ft.TextButton("Sign up", on_click=lambda _: navigate_to("/register"))], alignment=ft.MainAxisAlignment.CENTER),
+                    ft.Container(height=20)
+
+                    ], spacing=0)
+                )
+
+        ], spacing=0)
     )
+
+    async def animate_in():
+        time.sleep(0.05)
+        container.opacity = 1
+        container.update()
+    
+    container.opacity = 0
+    container.animate_opacity = 500
+    page.run_task(animate_in)
+    
+    return container
