@@ -1,36 +1,74 @@
 import flet as ft
+from utils import constants as fonts
 
-def WelcomeView(page: ft.Page, navigate_to):
-    return ft.Container(
-        content=ft.Column(
-            [
-                ft.Text("Vura", size=50, weight="bold", color=ft.Colors.BLUE_700),
-                ft.Text("The Health App", size=20, color=ft.Colors.BLUE_GREY_500),
-                ft.Divider(height=40, color=ft.Colors.TRANSPARENT),
-                ft.ElevatedButton(
-                    "Iniciar Sesión",
-                    on_click=lambda _: navigate_to("/login"),
-                    width=250,
-                    height=55,
-                    style=ft.ButtonStyle(
-                        shape=ft.RoundedRectangleBorder(radius=10),
-                    )
-                ),
-                ft.Container(height=10), # Espaciador
-                ft.OutlinedButton(
-                    "Registrarse",
-                    on_click=lambda _: navigate_to("/register"),
-                    width=250,
-                    height=55,
-                    style=ft.ButtonStyle(
-                        shape=ft.RoundedRectangleBorder(radius=10),
-                    )
-                ),
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-        ),
-        alignment=ft.Alignment(0, 0),
-        expand=True,
-        padding=30,
-    )
+class WelcomeView(ft.View):
+    def __init__(self, page: ft.Page, navigate_to):
+        super().__init__(route="/")
+        self.page_ref = page
+        self.navigate_to = navigate_to
+        self.controls = [self._build_content()]
+
+    def _build_content(self):
+        return ft.Container(
+            gradient= ft.LinearGradient(
+                begin=ft.Alignment.TOP_CENTER,
+                end=ft.Alignment.BOTTOM_CENTER,
+                colors=[
+                    "#002B36", 
+                    "#14655B",
+                    "#A7FFEB"
+                    ],
+                    stops = [0.0, 0.6, 1.0]
+            ),
+            expand=True,
+            content=ft.Column(
+                [
+                    ft.Container(height=120),
+                    ft.Icon(ft.Icons.FAVORITE_ROUNDED, size=120, color=ft.Colors.WHITE),
+                    ft.Text("VURA", size = 45, font_family=fonts.FontsTitles.TITLE, color=ft.Colors.WHITE, text_align=ft.TextAlign.CENTER),
+                    ft.Container(height=10),
+
+                    ft.Container(expand=True),
+                    ft.Text(
+                        "Tu aplicación de salud\ntodo en uno",
+                        size=13,
+                        font_family = fonts.FontsApp.NORMAL,
+                        color=ft.Colors.WHITE,
+                        text_align=ft.TextAlign.CENTER,
+                    ),
+                    ft.ElevatedButton(
+                        content = ft.Text(
+                            "Iniciar Sesión", 
+                            font_family = fonts.FontsApp.BOLD, 
+                            color = "#14655B"),
+                        on_click=lambda _: self.navigate_to("/login"),
+                        width = 200,
+                        height = 50,
+                        style = ft.ButtonStyle(
+                            shape=ft.RoundedRectangleBorder(radius=40),
+                            bgcolor=ft.Colors.WHITE,
+                            color = "#013F4A",
+                        ),
+                    ),
+                    ft.Container(height=0),
+                    ft.OutlinedButton(
+                        content = ft.Text(
+                            "Crear Cuenta",
+                            font_family = fonts.FontsApp.BOLD,
+                            color = ft.Colors.WHITE
+                        ),
+                        on_click=lambda _: self.navigate_to("/register"),
+                        width=200,
+                        height=50,
+                        style=ft.ButtonStyle(
+                            shape=ft.RoundedRectangleBorder(radius=40),
+                            side=ft.BorderSide(2, ft.Colors.WHITE),
+                            color = ft.Colors.WHITE,
+                        ),
+                    ),
+                    ft.Container(height=60),
+                ],
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            ),
+            padding=50,
+        )
