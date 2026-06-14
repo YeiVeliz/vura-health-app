@@ -1,34 +1,28 @@
 import flet as ft
-from views.welcome_view import WelcomeView
-from views.login_view import LoginView
-from views.register_view import RegisterView
-from views.home_view import HomeView
+import os
+from utils.navigation import Router
 
 def main(page: ft.Page):
-    # Configuración de ventana tipo móvil
     page.window.width = 390
     page.window.height = 800
     page.window.resizable = False  
     page.window.maximizable = False
-    page.bgcolor = ft.Colors.TRANSPARENT
     
     page.title = "Vura: The Health App"
     page.theme_mode = ft.ThemeMode.LIGHT
 
-    def navigate_to(route):
-        page.views.clear()
-        
-        if route == "/": view = WelcomeView(page, navigate_to)
-        elif route == "/login": view = LoginView(page, navigate_to)
-        elif route == "/register": view = RegisterView(page, navigate_to)
-        elif route == "/home": view = HomeView(page, navigate_to)
-        else: view = WelcomeView(page, navigate_to)
-        
-        page.views.append(view)
-        page.update()
+    page.fonts = {}
+    fonts_dir = os.path.join(os.path.dirname(__file__), "assets", "fonts")
+    
+    if os.path.exists(fonts_dir):
+        for filename in os.listdir(fonts_dir):
+            if filename.lower().endswith((".ttf", ".otf")):
+                font_name = os.path.splitext(filename)[0]
+                page.fonts[font_name] = f"fonts/{filename}"
 
-    # Cargamos la pantalla inicial
-    navigate_to("/")
+    router = Router(page)
+    
+    router.navigate_to("/")
 
 if __name__ == "__main__":
     ft.app(target=main)

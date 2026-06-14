@@ -1,83 +1,118 @@
 import flet as ft
-from utils.firebase_config import auth
+import time
+from services.auth_service import AuthService
+from utils.styles import AppStyles
+from utils.session_manager import SessionManager
+from utils import constants as fonts
 
 class RegisterView(ft.View):
     def __init__(self, page: ft.Page, navigate_to):
         super().__init__(route="/register")
         self.page_ref = page
         self.navigate_to = navigate_to
-        self.input_style = dict(
-            filled=True,
-            fill_color=ft.Colors.GREY_100,
-            border_color=ft.Colors.TRANSPARENT,
-            border_radius=20,
-            content_padding=ft.Padding(20, 15, 20, 15),
-        )
+        self.input_style = AppStyles.INPUT_STYLE
         self.controls = [self._build_content()]
 
     def _build_content(self):
-        full_name = ft.TextField(label="Full Name", **self.input_style)
-        email = ft.TextField(label="Email", **self.input_style)
-        password = ft.TextField(label="Password", password=True, can_reveal_password=True, **self.input_style)
-        
+
+        def create_input(label, hint, password=False):
+            return ft.Column([
+                ft.Text(
+                    label, 
+                    size=12, 
+                    weight="w600",
+                    color = "#002B36",
+                    font_family=fonts.FontsApp.NORMAL
+                    ),
+                ft.TextField(hint_text=hint, password=password, can_reveal_password=password, 
+                    **{
+                        **self.input_style, 
+                        "text_style": ft.TextStyle(font_family = fonts.FontsApp.LIGHT, size = 10),
+                        "hint_style": ft.TextStyle(font_family = fonts.FontsApp.LIGHT, color = ft.Colors.GREY_500, size = 10)}
+                    )
+            ], spacing=5)
+
+        full_name = create_input("Usuario", "Juan Pérez")
+        email = create_input("Correo Electrónico", "ejemplo@correo.com")
+        password = create_input("Contraseña", "********", password=True)
+
         container = ft.Container(
-            bgcolor=ft.Colors.BLUE_700,
             expand=True,
+            gradient=ft.LinearGradient(
+                begin=ft.Alignment.TOP_CENTER,
+                end=ft.Alignment.BOTTOM_CENTER,
+                colors=[
+                    "#002B36", 
+                    "#14655B",
+                    "#A7FFEB"
+                ],
+                stops=[0.0, 0.6, 1.0]
+            ),
             content=ft.Column([
                 ft.Container(height=40),
                 ft.Row([ft.IconButton(ft.Icons.ARROW_BACK, on_click=lambda _: self.navigate_to("/"), icon_color=ft.Colors.WHITE)]),
-                ft.Container(height=20),
+                ft.Container(height=10),
                 ft.Container(
-                    padding=ft.Padding(30, 0, 0, 0),
-                    content=ft.Text("Get Started", size=32, weight="bold", color=ft.Colors.WHITE),
+                    alignment=ft.Alignment.CENTER,
+                    content=ft.Text(
+                        "Crea tu cuenta", 
+                        size=30, 
+                        color=ft.Colors.WHITE, 
+                        font_family=fonts.FontsTitles.TITLE),
                 ),
                 ft.Container(height=20),
+                # La tarjeta blanca que ocupa el resto
                 ft.Container(
                     bgcolor=ft.Colors.WHITE,
                     border_radius=ft.BorderRadius(40, 40, 0, 0),
-                    padding=40,
+                    padding=30,
                     expand=True,
                     content=ft.Column([
+                        ft.Container(height=10),
                         full_name,
-                        ft.Container(height=15),
                         email,
-                        ft.Container(height=15),
                         password,
-                        ft.Container(height=25),
+                        ft.Container(height=10),
                         ft.ElevatedButton(
-                            "Sign up", 
-                            on_click=lambda e: self.handle_register(email.value, password.value),
+                            content = ft.Text(
+                                "Crear Cuenta",
+                                font_family = fonts.FontsApp.BOLD,
+                                color = ft.Colors.WHITE
+                                ),
+                            on_click=lambda e: self.handle_register(email.controls[1].value, password.controls[1].value),
                             width=float("inf"), 
-                            height=55, 
-                            style=ft.ButtonStyle(
-                                shape=ft.RoundedRectangleBorder(radius=20), 
-                                bgcolor=ft.Colors.BLUE_700, 
-                                color=ft.Colors.WHITE
-                            )
+                            height=50, 
+                            style=AppStyles.get_elevated_button_style(bgcolor = "#14655B")
                         ),
-                        ft.Container(height=30),
                         ft.Divider(color=ft.Colors.GREY_300),
-                        ft.Container(height=20),
-                        ft.Text("Sign up with", color=ft.Colors.GREY_500, text_align=ft.TextAlign.CENTER),
-                        ft.Container(height=15),
                         ft.Row([
-                            ft.IconButton(ft.Icons.FACEBOOK, icon_color=ft.Colors.BLUE_800), 
-                            ft.IconButton(ft.Icons.G_MOBILEDATA, icon_color=ft.Colors.RED_600), 
-                            ft.IconButton(ft.Icons.APPLE, icon_color=ft.Colors.BLACK)
-                        ], alignment=ft.MainAxisAlignment.CENTER),
-                        ft.Container(expand=True),
-                        ft.Row([ft.Text("Already have an account?"), ft.TextButton("Sign in", on_click=lambda _: self.navigate_to("/login"))], alignment=ft.MainAxisAlignment.CENTER),
-                        ft.Container(height=20)
-                    ], spacing=0)
+                            ft.IconButton(ft.Icons.FACEBOOK, icon_color=ft.Colors.BLUE_800, icon_size=40), 
+                            ft.IconButton(ft.Icons.G_MOBILEDATA, icon_color=ft.Colors.RED_600, icon_size=40), 
+                            ft.IconButton(ft.Icons.APPLE, icon_color=ft.Colors.BLACK, icon_size=40)
+                        ], alignment=ft.MainAxisAlignment.CENTER, spacing=20),
+                        ft.Row([ft.Text("Ya tienes una cuenta?"), ft.TextButton("Inicia Sesión", on_click=lambda _: self.navigate_to("/login"), style=ft.ButtonStyle(color = "#14655B"))], alignment=ft.MainAxisAlignment.CENTER),
+                    ], spacing=10)
                 )
             ], spacing=0)
         )
+        
+        # Animación de entrada
+        container.opacity = 0
+        container.animate_opacity = 500
+        
+        async def animate_in():
+            time.sleep(0.05)
+            container.opacity = 1
+            container.update()
+        
+        self.page_ref.run_task(animate_in)
+        
         return container
 
     def handle_register(self, email, password):
         try:
-            user = auth.create_user_with_email_and_password(email, password)
-            self.page.data = {"user": user}
+            user = AuthService.sign_up(email, password)
+            SessionManager().set_user(user) # Usamos el Singleton
             self.navigate_to("/home")
         except Exception as e:
             print(f"Error register: {e}")
