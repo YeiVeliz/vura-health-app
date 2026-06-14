@@ -10,31 +10,22 @@ def main(page: ft.Page):
     page.window.height = 800
     page.window.resizable = False  
     page.window.maximizable = False
+    page.bgcolor = ft.Colors.TRANSPARENT
     
     page.title = "Vura: The Health App"
     page.theme_mode = ft.ThemeMode.LIGHT
 
     def navigate_to(route):
-        # 1. Determinar qué vista mostrar
+        page.views.clear()
+        
         if route == "/": view = WelcomeView(page, navigate_to)
         elif route == "/login": view = LoginView(page, navigate_to)
         elif route == "/register": view = RegisterView(page, navigate_to)
         elif route == "/home": view = HomeView(page, navigate_to)
         else: view = WelcomeView(page, navigate_to)
         
-        # 2. Configurar la animación (Fade-in)
-        # Aplicamos opacidad inicial al contenedor raíz de la vista
-        view.opacity = 0
-        view.animate_opacity = 500  # Animación de 500ms
-        
-        # 3. Limpiar y añadir
-        page.clean()
-        page.add(view)
+        page.views.append(view)
         page.update()
-        
-        # 4. Trigger de la animación (usamos un pequeño delay para asegurar la transición)
-        view.opacity = 1
-        view.update()
 
     # Cargamos la pantalla inicial
     navigate_to("/")

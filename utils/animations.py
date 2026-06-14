@@ -4,7 +4,7 @@ import time
 # Animación de entrada suave para cualquier vista
 def apply_fade_in_animation(view_content):
     view_content.opacity = 0
-    view_content.animate_opacity = 500  # Duración de 500ms
+    view_content.animate_opacity = 800
     
     def trigger():
         time.sleep(0.1)
@@ -21,7 +21,7 @@ def navigate_with_animation(page, target_view_func, navigate_to):
     # 2. Si es un Container, aplicamos la opacidad
     if isinstance(new_view, ft.Container):
         new_view.opacity = 0
-        new_view.animate_opacity = 400
+        new_view.animate_opacity = 800
         
         # 3. Limpiamos y añadimos
         page.clean()
