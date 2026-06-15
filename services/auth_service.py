@@ -10,3 +10,8 @@ class AuthService:
     def sign_up(email, password):
         """Registra un nuevo usuario."""
         return auth.create_user_with_email_and_password(email, password)
+    
+    @staticmethod
+    def refresh_token(refresh_token):
+        """Refresca el token de autenticación."""
+        return auth.refresh(refresh_token)

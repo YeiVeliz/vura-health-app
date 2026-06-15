@@ -2,8 +2,7 @@ import flet as ft
 from utils.firebase_config import db
 
 def HomeView(page: ft.Page, navigate_to):
-    # Obtener el correo del usuario logueado o usar uno por defecto para pruebas
-    user_email = "Usuario de Vura"
+    user_email = "Usuario"
     user_id = None
     if page.data and "user" in page.data:
         user_email = page.data["user"].get("email", user_email)
@@ -90,7 +89,7 @@ def HomeView(page: ft.Page, navigate_to):
     # Botón de Cerrar Sesión
     def handle_logout(e):
         page.data = None
-        navigate_to("/")
+        navigate_to("/welcome")
 
     # Tarjetas del Dashboard estilizadas
     water_card = ft.Card(

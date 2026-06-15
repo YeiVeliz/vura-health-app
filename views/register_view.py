@@ -44,13 +44,13 @@ class RegisterView(ft.View):
                 colors=[
                     "#002B36", 
                     "#14655B",
-                    "#A7FFEB"
+                    "#55EFCB"
                 ],
                 stops=[0.0, 0.6, 1.0]
             ),
             content=ft.Column([
                 ft.Container(height=40),
-                ft.Row([ft.IconButton(ft.Icons.ARROW_BACK, on_click=lambda _: self.navigate_to("/"), icon_color=ft.Colors.WHITE)]),
+                ft.Row([ft.IconButton(ft.Icons.ARROW_BACK, on_click=lambda _: self.navigate_to("/welcome"), icon_color=ft.Colors.WHITE)]),
                 ft.Container(height=10),
                 ft.Container(
                     alignment=ft.Alignment.CENTER,
@@ -112,7 +112,10 @@ class RegisterView(ft.View):
     def handle_register(self, email, password):
         try:
             user = AuthService.sign_up(email, password)
-            SessionManager().set_user(user) # Usamos el Singleton
+            SessionManager().set_user(user)
+            # Guardamos la sesión persistentemente
+            from utils.session_persistence import save_session
+            save_session(user)
             self.navigate_to("/home")
         except Exception as e:
             print(f"Error register: {e}")

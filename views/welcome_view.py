@@ -3,7 +3,7 @@ from utils import constants as fonts
 
 class WelcomeView(ft.View):
     def __init__(self, page: ft.Page, navigate_to):
-        super().__init__(route="/")
+        super().__init__(route="/welcome")
         self.page_ref = page
         self.navigate_to = navigate_to
         self.controls = [self._build_content()]
@@ -16,7 +16,7 @@ class WelcomeView(ft.View):
                 colors=[
                     "#002B36", 
                     "#14655B",
-                    "#A7FFEB"
+                    "#55EFCB"
                     ],
                     stops = [0.0, 0.6, 1.0]
             ),
